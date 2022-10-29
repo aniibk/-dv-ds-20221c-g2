@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<title>Editar Prenda</title>
+</head>
+<body>
+<div  class="container" align="center">
+		<h1>Editar cantidad artículo vendido</h1>
+		<br />
+	<form action="#" th:action="@{/tienda/ventas/items/update}"
+			th:object="${vicr}" method="post">
+
+			<table border="0" cellpadding="10">
+								
+				<tr>
+					<td>Venta Id:</td>
+					<td><input type="number" th:field="*{ventaId}" readonly="readonly"/></td>
+				</tr>
+				
+				<tr>
+					<td>Prenda id:</td>
+					<td><input type="number" th:field="*{prendaId}" readonly="readonly"/></td>
+				</tr>
+				
+				<tr>
+					<td>Cantidad:</td>
+					<td><input type="number" th:field="*{cantidad}" /></td>
+				</tr>
+				
+				<tr>
+					<td colspan="2"><button type="submit">Grabar</button></td>
+				</tr>
+			</table>
+		</form>
+<tbody>
+</div>
+
+</body>
+</html>

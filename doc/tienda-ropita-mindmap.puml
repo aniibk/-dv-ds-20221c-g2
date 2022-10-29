@@ -1,0 +1,148 @@
+@startuml
+
+Title Tienda Ropita - Diagrama de Clases de Análisis
+
+skinparam class {
+BackgroundColor<<Entity>> Orange
+BorderColor<<Entity>> Red
+}
+
+skinparam class {
+BackgroundColor<<Service>> LightGreen
+BorderColor<<Service>> Red
+}
+
+
+class Tienda <<Entity>> {
+
+	List<Venta> ventas
+	List<Prenda> prendas
+	
+	registrarVenta()
+	ventasDia(fecha)
+}
+
+class Prenda <<Entity>> {
+	String nombre
+	Double precioBase
+	EstadoPrendaStrategy estadoPrenda
+	TipoPrenda tipoPrenda
+	
+	Double precioVenta()
+}
+note right of Prenda
+precioVenta = 
+estadoPrenda.precioVenta(precioBase)
+end note
+
+enum TipoPrenda <<Service>>{
+	SACO
+	PANTALON
+	CAMISA
+	...
+}
+
+interface EstadoPrendaStrategy <<Service>>{
+	Double precioVenta(PrecioBase)
+}
+
+class PrendaNueva <<Service>>{
+	Double precioVenta(PrecioBase)
+}
+note bottom of PrendaNueva
+precio venta = precio base
+end note
+
+class PrendaPromocion <<Service>>{
+	valorDescuento
+ 	
+	Double precioVenta(PrecioBase)
+}
+note bottom of PrendaPromocion
+precio venta = precio base - valor fijo
+end note
+
+class PrendaLiquidacion <<Service>>{
+	porcentajeDescuento
+
+	Double precioVenta(PrecioBase)
+}
+note bottom of PrendaLiquidacion
+porcentajeDescuento = 0.5
+precio venta =  precio base - 50% del precio base
+end note
+
+
+abstract class Venta <<Entity>>{
+	List<Item> items
+	Date fecha
+	MedioPagoStrategy medioPago
+	
+	totalVenta()
+	{abstract} recargo()	
+}
+
+note top of Venta
+Venta implementa el patrón TemplateMethod
+en el método recargo()
+totalVenta = suma de items.precioVenta() + recargo()
+end note
+
+class ItemVenta <<Entity>> {
+	Prenda prendaClonada
+	Integer cantidad
+	
+	precioVenta()
+}
+note right of ItemVenta
+la prenda es un clon de la prenda vendida
+para tener la foto del estado actual
+precioVenta = prendaClonada.precioVenta()
+end note
+
+
+
+class VentaEfectivo <<Entity>> {
+
+	recargo()
+}
+
+note bottom of VentaEfectivo
+recargo = 0
+end note
+
+
+class VentaTarjeta <<Entity>> {
+	Integer cantidadCotas
+	Double coeficiente
+	
+	recargo()
+
+}
+
+note bottom of VentaTarjeta
+recargo = (cantidad de cuotas * 
+ un coeficiente fijo + 
+0.01 del valor de cada prenda)
+end note
+
+
+Tienda o-right- Venta
+Tienda o-right- Prenda
+
+Venta *-- ItemVenta
+ItemVenta o-- Prenda
+
+Venta <|-right- VentaEfectivo
+Venta <|-right- VentaTarjeta
+
+Prenda o-right- EstadoPrendaStrategy
+Prenda -- TipoPrenda
+
+
+EstadoPrendaStrategy <|.. PrendaNueva
+EstadoPrendaStrategy <|.. PrendaPromocion
+EstadoPrendaStrategy <|.. PrendaLiquidacion
+
+
+@enduml
